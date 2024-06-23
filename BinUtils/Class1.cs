@@ -7,20 +7,21 @@ using System.Text;
 
 public class DebFile
 {   
+    public class Archive {
+        public string Name;
+        public Int64 ModificationTimestamp;
 
+
+    };
+
+    public Archive[] Archives { get; private set; }
     public DebFile() {
     }
-
-}
-
-public class DebFileProps {
-
 }
 
 public class DebFileParser {
     public static class Constants {
         public const string ArchiveSignature = "!<arch>\n";
-        public const string Identifier = "debian-binary";
     }
 
     public BinaryReader Reader { get; private set; }
@@ -42,15 +43,31 @@ public class DebFileParser {
             return null;
         }
 
+
+        return new DebFile();
+    }
+
+    private DebFile.Archive? ReadArchive() {
         var identifier = ReadASCIIString(16);
-        if(identifier == null || !identifier.Equals(Constants.Identifier)) {
+        if(identifier == null) {
+            return null;
+        }
+
+        var timestamp = ReadASCIIString(12);
+        if(timestamp == null) {
+            return null;
+        }
+
+        UInt64 parsedDatetime;        
+        if(!UInt64.TryParse(timestamp, out parsedDatetime)) {
             return null;
         }
 
         
 
 
-        return new DebFile();
+
+        return null;
     }
 
     private string? ReadASCIIString(int charCount, bool removeSpacePadding = true) {
